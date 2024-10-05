@@ -10,30 +10,9 @@
             margin: 0;
             overflow: hidden; /* 스크롤 방지 */
         }
-        #chatBox {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            width: 300px;
-            height: 200px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            overflow-y: scroll; /* 스크롤 가능 */
-            padding: 10px;
-            border-radius: 5px;
-        }
-        #chatInput {
-            position: absolute;
-            bottom: 220px;
-            left: 10px;
-            width: 300px;
-        }
     </style>
 </head>
 <body>
-<div id="chatBox"></div>
-<input type="text" id="chatInput" placeholder="채팅 입력..." />
-
 <script>
     // 각 사용자를 위한 고유 6자리 ID 생성
     function generateId() {
@@ -50,7 +29,6 @@
         console.log("웹소켓 연결이 설정되었습니다.");
         // 사용자 ID를 서버에 전송
         socket.send(JSON.stringify({ id: sessionId }));
-        addChatMessage(`Welcome! You are connected with session ID: ${sessionId}`); // 환영 메시지 추가
     };
 
     socket.onmessage = function(event) {
@@ -64,13 +42,7 @@
         if (jsonString.startsWith('{') && jsonString.endsWith('}')) {
             try {
                 const data = JSON.parse(jsonString); // JSON 파싱
-
-                if (data.message) {
-                    // 채팅 메시지 처리
-                    addChatMessage(`${data.id}: ${data.message}`); // 채팅 박스에 추가
-                } else {
-                    updateOtherPlayers(data); // 다른 플레이어 업데이트
-                }
+                updateOtherPlayers(data); // 다른 플레이어 업데이트
             } catch (error) {
                 console.error("JSON 파싱 오류:", error);
                 console.log("받은 데이터:", event.data);
@@ -87,12 +59,6 @@
     function sendPosition(x, y) {
         if (socket.readyState === WebSocket.OPEN) {
             socket.send(JSON.stringify({ id: sessionId, x: x, y: y }));
-        }
-    }
-
-    function sendChatMessage(message) {
-        if (socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify({ id: sessionId, message: message }));
         }
     }
 
@@ -135,17 +101,6 @@
 
         // 방향키 설정
         cursors = this.input.keyboard.createCursorKeys();
-
-        // 채팅 입력 이벤트
-        document.getElementById("chatInput").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                const message = this.value.trim();
-                if (message) {
-                    sendChatMessage(message); // 채팅 메시지 전송
-                    this.value = ''; // 입력창 비우기
-                }
-            }
-        });
     }
 
     function update() {
@@ -191,14 +146,6 @@
         let newPlayerText = game.scene.scenes[0].add.text(x, y, id, { fontSize: '32px', fill: '#ffffff' });
         newPlayerText.setOrigin(0.5, 0.5); // 텍스트 중앙 정렬
         return newPlayerText;
-    }
-
-    function addChatMessage(message) {
-        const chatBox = document.getElementById("chatBox");
-        const messageElement = document.createElement("div");
-        messageElement.textContent = message;
-        chatBox.appendChild(messageElement);
-        chatBox.scrollTop = chatBox.scrollHeight; // 스크롤을 아래로
     }
 
 </script>
