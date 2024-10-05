@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phaser Key Input Example</title>
+    <!-- Phaser.js 라이브러리 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden; /* 스크롤 방지 */
+        }
+    </style>
+</head>
+<body>
+<script>
+    // 게임 설정
+    const config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        physics: {
+            default: 'arcade',
+            arcade: {
+                gravity: { y: 0 },
+                debug: false
+            }
+        },
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+    const game = new Phaser.Game(config); // 게임 인스턴스 생성
+
+    let player; // 플레이어 변수
+    let cursors; // 방향키 변수
+
+    // 자원 로드
+    function preload() {
+        this.load.image('player', 'images/logoG.png'); // 플레이어 스프라이트 로드 (Phaser 로고 이미지)
+    }
+
+    // 게임 생성
+    function create() {
+        // 플레이어 생성
+        player = this.physics.add.sprite(400, 300, 'player');
+        player.setCollideWorldBounds(true); // 월드 경계에서 충돌 방지
+
+        // 방향키 입력 설정
+        cursors = this.input.keyboard.createCursorKeys(); // 방향키 입력 생성
+    }
+
+    // 게임 업데이트
+    function update() {
+        player.setVelocity(0); // 매 프레임마다 속도를 0으로 초기화
+
+        // 방향키 조작
+        if (cursors.left.isDown) {
+            player.setVelocityX(-160); // 왼쪽
+        } else if (cursors.right.isDown) {
+            player.setVelocityX(160); // 오른쪽
+        }
+
+        if (cursors.up.isDown) {
+            player.setVelocityY(-160); // 위쪽
+        } else if (cursors.down.isDown) {
+            player.setVelocityY(160); // 아래쪽
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Chat</title>
+    <script>
+        let socket;
+
+        function connect() {
+            socket = new WebSocket("wss://localhost:8443/websocket");
+
+            socket.onopen = function() {
+                console.log("Connected to the server");
+            };
+
+            socket.onmessage = function(event) {
+                const chatBox = document.getElementById("chatBox");
+                chatBox.value += event.data + "\n"; // 수신된 메시지를 채팅 박스에 추가
+            };
+
+            socket.onclose = function() {
+                console.log("Disconnected from the server");
+            };
+
+            socket.onerror = function(error) {
+                console.error("WebSocket error: ", error);
+            };
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById("messageInput");
+            const message = messageInput.value;
+            socket.send(message); // 메시지 전송
+            messageInput.value = ""; // 입력 필드 초기화
+        }
+
+        window.onload = function() {
+            connect();
+        };
+    </script>
+</head>
+<body>
+<h1>WebSocket Chat</h1>
+<textarea id="chatBox" rows="10" cols="30" readonly></textarea><br>
+<input type="text" id="messageInput" placeholder="Enter a message...">
+<button onclick="sendMessage()">Send</button>
+</body>
+</html>
