@@ -9,6 +9,7 @@
         body {
             margin: 0;
             overflow: hidden; /* 스크롤 방지 */
+            background-color: #ADD8E6; /* 배경색 */
         }
         #chatBox {
             position: absolute;
@@ -123,12 +124,15 @@
     let lastSentPosition = { x: null, y: null };  // 마지막으로 보낸 위치 저장
 
     function preload() {
-        // 로드할 이미지가 없으므로 비워둡니다.
+        this.load.image('background', '/images/pacman.png'); // 배경 이미지 로드
     }
 
     function create() {
+        // 배경 이미지 추가
+        this.add.image(400, 300, 'background').setOrigin(0.5, 0.5).setDisplaySize(559, 600); // 배경 이미지 위치와 크기 설정
+
         // 플레이어 텍스트 생성
-        player = this.add.text(400, 300, sessionId, { fontSize: '32px', fill: '#ffffff' });
+        player = this.add.text(400, 300, sessionId, { fontSize: '25px', fill: '#FFA500' });
         player.setOrigin(0.5, 0.5); // 텍스트 중앙 정렬
         this.physics.add.existing(player); // 텍스트 객체에 물리 추가
         player.body.setCollideWorldBounds(true); // 월드 경계에서 벗어나는 것을 방지
@@ -188,7 +192,7 @@
     }
 
     function createPlayer(x, y, id) {
-        let newPlayerText = game.scene.scenes[0].add.text(x, y, id, { fontSize: '32px', fill: '#ffffff' });
+        let newPlayerText = game.scene.scenes[0].add.text(x, y, id, { fontSize: '20px', fill: '#ffffff' });
         newPlayerText.setOrigin(0.5, 0.5); // 텍스트 중앙 정렬
         return newPlayerText;
     }
