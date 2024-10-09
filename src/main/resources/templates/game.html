@@ -46,7 +46,7 @@
 <body>
 <div id="header">Welcome to My 2D-Game!!!</div>
 <div id="chatBox"></div>
-<input type="text" id="chatInput" placeholder="채팅 입력..." />
+<input type="text" id="chatInput" placeholder="채팅 입력 후 엔터" />
 
 <script>
     // 각 사용자를 위한 고유 6자리 ID 생성
@@ -135,6 +135,7 @@
     let otherPlayers = {}; // 다른 플레이어들 정보 저장 객체
 
     let lastSentPosition = { x: null, y: null };  // 마지막으로 보낸 위치 저장
+    let positionText; // 플레이어 좌표를 표시할 텍스트 변수
 
     function preload() {
         this.load.image('background', '/images/pacman.png'); // 배경 이미지 로드
@@ -149,6 +150,15 @@
         player.setOrigin(0.5, 0.5); // 텍스트 중앙 정렬
         this.physics.add.existing(player); // 텍스트 객체에 물리 추가
         player.body.setCollideWorldBounds(true); // 월드 경계에서 벗어나는 것을 방지
+
+        // 카메라 설정: 플레이어를 따라다니도록 설정
+        this.cameras.main.startFollow(player);
+        this.cameras.main.setBounds(0, 0, 1600, 1200); // 설정할 전체 맵의 크기 (예: 1600x1200)
+
+        // 플레이어 좌표 표시 텍스트 생성
+        positionText = this.add.text(400, 20, '', { fontSize: '18px', fill: '#ffffff' });
+        positionText.setOrigin(0.5, 0); // 텍스트 중앙 정렬
+        positionText.setScrollFactor(0); // 카메라와 함께 움직이도록 설정
 
         // 방향키 설정
         cursors = this.input.keyboard.createCursorKeys();
@@ -190,6 +200,9 @@
             sendPosition(player.x, player.y);
             lastSentPosition = { x: player.x, y: player.y };  // 마지막 전송된 위치 업데이트
         }
+
+        // 현재 플레이어 좌표 업데이트
+        positionText.setText(`X: ${Math.round(player.x)}, Y: ${Math.round(player.y)}`);
     }
 
     function updateOtherPlayers(data) {
