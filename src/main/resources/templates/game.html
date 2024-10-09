@@ -145,7 +145,7 @@
         this.add.image(400, 300, 'background').setOrigin(0.5, 0.5).setDisplaySize(559, 600); // 배경 이미지 위치와 크기 설정
 
         // 플레이어 텍스트 생성
-        player = this.add.text(400, 300, sessionId, { fontSize: '25px', fill: '#FFA500' });
+        player = this.add.text(400, 300, sessionId, { fontSize: '22px', fill: '#FFA500' });
         player.setOrigin(0.5, 0.5); // 텍스트 중앙 정렬
         this.physics.add.existing(player); // 텍스트 객체에 물리 추가
         player.body.setCollideWorldBounds(true); // 월드 경계에서 벗어나는 것을 방지
