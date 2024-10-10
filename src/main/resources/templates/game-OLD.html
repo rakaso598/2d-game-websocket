@@ -48,41 +48,33 @@
 <input type="text" id="chatInput" placeholder="채팅 입력 후 엔터" />
 
 <script>
-    // 각 사용자를 위한 고유 6자리 ID 생성
     function generateId() {
         return Math.random().toString(36).substring(2, 8);
     }
 
-    const sessionId = generateId(); // 고유 세션 ID 생성
+    const sessionId = generateId();
     console.log("사용자 ID:", sessionId);
 
-    // 웹소켓 연결
     const socket = new WebSocket("ws://localhost:8080/websocket");
 
     socket.onopen = function() {
         console.log("웹소켓 연결이 설정되었습니다.");
-        // 사용자 ID를 서버에 전송
         socket.send(JSON.stringify({ id: sessionId }));
-        addChatMessage(`Welcome! You are connected with session ID: ${sessionId}`); // 환영 메시지 추가
+        addChatMessage(`Welcome! You are connected with session ID: ${sessionId}`);
     };
 
     socket.onmessage = function(event) {
-        console.log(event.data);  // 받은 메시지를 로그에 출력
+        console.log(event.data);
+        const jsonStartIndex = event.data.indexOf(':') + 1;
+        const jsonString = event.data.substring(jsonStartIndex).trim();
 
-        // 수신한 데이터에서 JSON 부분만 추출
-        const jsonStartIndex = event.data.indexOf(':') + 1; // ':' 이후의 인덱스부터 시작
-        const jsonString = event.data.substring(jsonStartIndex).trim(); // JSON 문자열 추출 및 공백 제거
-
-        // JSON 데이터인지 확인하기 위한 조건문
         if (jsonString.startsWith('{') && jsonString.endsWith('}')) {
             try {
-                const data = JSON.parse(jsonString); // JSON 파싱
-
+                const data = JSON.parse(jsonString);
                 if (data.message) {
-                    // 채팅 메시지 처리
-                    addChatMessage(`${data.id}: ${data.message}`); // 채팅 박스에 추가
+                    addChatMessage(`${data.id}: ${data.message}`);
                 } else {
-                    updateOtherPlayers(data); // 다른 플레이어 업데이트
+                    updateOtherPlayers(data);
                 }
             } catch (error) {
                 console.error("JSON 파싱 오류:", error);
@@ -129,113 +121,117 @@
 
     const game = new Phaser.Game(config);
 
-    let player; // 플레이어 변수
-    let playerSprite; // 플레이어 스프라이트 변수
-    let cursors; // 방향키 변수
-    let otherPlayers = {}; // 다른 플레이어들 정보 저장 객체
-
-    let lastSentPosition = { x: null, y: null };  // 마지막으로 보낸 위치 저장
-    let positionText; // 플레이어 좌표를 표시할 텍스트 변수
+    let player;
+    let playerSprite;
+    let cursors;
+    let otherPlayers = {};
+    let lastSentPosition = { x: null, y: null };
+    let positionText;
 
     function preload() {
-        // 스프라이트 시트 로드 (프레임 크기: 48x48)
-        this.load.spritesheet('cat', '/assets/images/cat_walk.png', { frameWidth: 48, frameHeight: 48 });
-        this.load.image('bg_day', '/assets/images/bg_day.png'); // 배경 이미지 로드
+        this.load.spritesheet('cat_walk', '/assets/images/cat_walk.png', { frameWidth: 48, frameHeight: 48 });
+        this.load.spritesheet('cat_idle', '/assets/images/cat_idle.png', { frameWidth: 48, frameHeight: 48 });
+        this.load.image('bg_day', '/assets/images/bg_day.png');
     }
 
     function create() {
-        // 배경 이미지 추가
-        this.add.image(400, 300, 'bg_day').setOrigin(0.5, 0.5).setDisplaySize(800, 600); // 배경 이미지 위치와 크기 설정
+        // 배경을 800x600 크기로 설정
+        this.add.image(400, 300, 'bg_day').setOrigin(0.5, 0.5).setDisplaySize(800, 600);
 
-        // 플레이어 스프라이트 생성
-        playerSprite = this.physics.add.sprite(400, 576, 'cat');
-        playerSprite.setOrigin(0.5, 0.5); // 스프라이트 중앙 정렬
-        playerSprite.body.setCollideWorldBounds(true); // 월드 경계에서 벗어나는 것을 방지
-        playerSprite.body.setGravityY(0); // 중력 비활성화
+        playerSprite = this.physics.add.sprite(400, 576, 'cat_idle');
+        playerSprite.setOrigin(0.5, 0.5);
+        playerSprite.body.setCollideWorldBounds(true); // 월드 경계 내에서 이동 가능
+        playerSprite.body.setGravityY(0);
 
-        // 애니메이션 생성
         this.anims.create({
             key: 'walk',
-            frames: this.anims.generateFrameNumbers('cat', { start: 0, end: 5 }), // 6개 프레임
+            frames: this.anims.generateFrameNumbers('cat_walk', { start: 0, end: 5 }),
             frameRate: 10,
-            repeat: -1 // 반복 재생
+            repeat: -1
         });
 
-        // 플레이어 ID 텍스트 생성
+        this.anims.create({
+            key: 'idle',
+            frames: this.anims.generateFrameNumbers('cat_idle', { start: 0, end: 3 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
         player = this.add.text(400, 60, sessionId, { fontSize: '20px', fill: '#FFFFFF' });
-        player.setOrigin(0.5, 0.5); // 텍스트 중앙 정렬
-        player.setScrollFactor(0); // 화면에 고정되도록 설정
+        player.setOrigin(0.5, 0.5);
+        player.setScrollFactor(0);
 
-        // 카메라 설정: 플레이어를 따라다니도록 설정
-        this.cameras.main.startFollow(playerSprite, false, 1, 0); // 가로는 따라다니고 세로는 고정 (lerpX: 1, lerpY: 0)
-        this.cameras.main.setBounds(0, 0, 1600, 600); // 가로 범위는 설정하고, 세로는 600으로 고정
+        // 카메라가 800x600 범위 내에서만 이동하도록 설정
+        this.cameras.main.setBounds(0, 0, 800, 600); // 카메라 경계 설정
+        this.cameras.main.startFollow(playerSprite, false, 1, 0); // 플레이어를 따라다니도록 설정
 
-        // 플레이어 좌표 표시 텍스트 생성
+
         positionText = this.add.text(400, 20, '', { fontSize: '18px', fill: '#ffffff' });
-        positionText.setOrigin(0.5, 0); // 텍스트 중앙 정렬
-        positionText.setScrollFactor(0); // 카메라와 함께 움직이도록 설정
+        positionText.setOrigin(0.5, 0);
+        positionText.setScrollFactor(0);
 
-        // 방향키 설정
         cursors = this.input.keyboard.createCursorKeys();
 
-        // 채팅 입력 이벤트
         document.getElementById("chatInput").addEventListener("keypress", function(event) {
             if (event.key === "Enter") {
                 const message = this.value.trim();
                 if (message) {
-                    sendChatMessage(message); // 채팅 메시지 전송
-                    this.value = ''; // 입력창 비우기
+                    sendChatMessage(message);
+                    this.value = '';
                 }
             }
         });
     }
 
+    // 캐릭터의 위치를 업데이트할 때 800x600 범위를 벗어나지 않도록 설정
     function update() {
         playerSprite.body.setVelocity(0);
-
         let moved = false;
 
         if (cursors.left.isDown) {
             playerSprite.body.setVelocityX(-160);
             moved = true;
-            playerSprite.anims.play('walk', true); // 애니메이션 재생
-            playerSprite.setFlipX(true); // 왼쪽으로 움직일 때 스프라이트 반전
+            playerSprite.anims.play('walk', true);
+            playerSprite.setFlipX(true);
         } else if (cursors.right.isDown) {
             playerSprite.body.setVelocityX(160);
             moved = true;
-            playerSprite.anims.play('walk', true); // 애니메이션 재생
-            playerSprite.setFlipX(false); // 오른쪽으로 움직일 때 스프라이트 반전 해제
+            playerSprite.anims.play('walk', true);
+            playerSprite.setFlipX(false);
         }
 
         if (cursors.up.isDown) {
             playerSprite.body.setVelocityY(-160);
             moved = true;
-            playerSprite.anims.play('walk', true); // 애니메이션 재생
+            playerSprite.anims.play('walk', true);
         } else if (cursors.down.isDown) {
             playerSprite.body.setVelocityY(160);
             moved = true;
-            playerSprite.anims.play('walk', true); // 애니메이션 재생
+            playerSprite.anims.play('walk', true);
         }
 
         if (!moved) {
-            playerSprite.anims.stop(); // 정지 시 애니메이션 멈춤
+            playerSprite.anims.play('idle', true);
         }
+
+        // 캐릭터가 맵을 벗어나지 않도록 위치 조정
+        playerSprite.x = Phaser.Math.Clamp(playerSprite.x, 0, 800);
+        playerSprite.y = Phaser.Math.Clamp(playerSprite.y, 0, 600);
 
         if (moved && (playerSprite.x !== lastSentPosition.x || playerSprite.y !== lastSentPosition.y)) {
             sendPosition(playerSprite.x, playerSprite.y);
-            lastSentPosition = { x: playerSprite.x, y: playerSprite.y };  // 마지막 전송된 위치 업데이트
+            lastSentPosition = { x: playerSprite.x, y: playerSprite.y };
         }
 
-        // 현재 플레이어 좌표 업데이트
         positionText.setText(`X: ${Math.round(playerSprite.x)}, Y: ${Math.round(playerSprite.y)}`);
     }
 
     function createPlayer(x, y, id) {
-        // 다른 플레이어의 스프라이트를 생성
-        let newPlayerSprite = game.scene.scenes[0].physics.add.sprite(0, 0, 'cat'); // 위치는 0, 0으로 초기화
-        newPlayerSprite.setOrigin(0.5, 0.5); // 스프라이트 중앙 정렬
-        newPlayerSprite.body.setCollideWorldBounds(true); // 월드 경계에서 벗어나는 것을 방지
-        newPlayerSprite.body.setGravityY(0); // 중력 비활성화
+        let newPlayerSprite = game.scene.scenes[0].physics.add.sprite(0, 0, 'cat_idle'); // 초기 위치를 (0, 0)으로 설정
+        newPlayerSprite.setOrigin(0.5, 0.5);
+        newPlayerSprite.body.setCollideWorldBounds(true);
+        newPlayerSprite.body.setGravityY(0);
+        newPlayerSprite.anims.play('idle', true); // Idle 애니메이션 적용
 
         // 플레이어의 ID를 위에 텍스트로 표시
         let playerText = game.scene.scenes[0].add.text(0, -20, id, { fontSize: '16px', fill: '#ffffff' });
@@ -243,32 +239,37 @@
 
         // 스프라이트와 텍스트를 함께 움직이기 위해 컨테이너 생성
         let container = game.scene.scenes[0].add.container(x, y, [newPlayerSprite, playerText]);
-        container.setSize(48, 48); // 스프라이트 크기에 맞춰 컨테이너 크기 설정
-        game.scene.scenes[0].physics.world.enable(container); // 물리 엔진과 연결
-
-        return container; // 컨테이너 반환
+        container.setSize(newPlayerSprite.width, newPlayerSprite.height); // 컨테이너 크기 설정
+        otherPlayers[id] = container; // 다른 플레이어 관리
     }
 
     function updateOtherPlayers(data) {
-        if (data.id !== sessionId) { // 자신이 보낸 메시지는 무시
-            if (!otherPlayers[data.id]) {
-                // 다른 플레이어가 없으면 새로 생성
-                otherPlayers[data.id] = createPlayer(data.x, data.y, data.id);
-            } else {
-                // 기존 플레이어가 있으면 위치 업데이트
-                otherPlayers[data.id].setPosition(data.x, data.y); // 컨테이너의 위치를 업데이트
+        const { id, x, y } = data;
+
+        if (!otherPlayers[id]) {
+            createPlayer(x, y, id);
+        } else {
+            const playerContainer = otherPlayers[id];
+            playerContainer.setPosition(x, y); // 컨테이너의 위치 업데이트
+
+            // 방향 설정
+            const playerSprite = playerContainer.getAt(0); // 첫 번째 자식이 스프라이트
+            if (x > playerSprite.x) {
+                playerSprite.setFlipX(false); // 오른쪽을 바라봄
+            } else if (x < playerSprite.x) {
+                playerSprite.setFlipX(true); // 왼쪽을 바라봄
             }
+
+            // 텍스트 ID의 위치는 스프라이트 위로 고정
+            playerContainer.getAt(1).setPosition(0, -20); // 텍스트 ID를 스프라이트 위로 이동
         }
     }
 
     function addChatMessage(message) {
-        const chatBox = document.getElementById("chatBox");
-        const messageElement = document.createElement("div");
-        messageElement.textContent = message;
-        chatBox.appendChild(messageElement);
-        chatBox.scrollTop = chatBox.scrollHeight; // 스크롤을 아래로
+        const chatBox = document.getElementById('chatBox');
+        chatBox.innerHTML += `<div>${message}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight; // 스크롤을 최신 메시지로 이동
     }
-
 </script>
 </body>
 </html>
