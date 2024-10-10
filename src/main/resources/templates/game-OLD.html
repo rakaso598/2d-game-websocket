@@ -151,6 +151,7 @@
         playerSprite = this.physics.add.sprite(400, 576, 'cat');
         playerSprite.setOrigin(0.5, 0.5); // 스프라이트 중앙 정렬
         playerSprite.body.setCollideWorldBounds(true); // 월드 경계에서 벗어나는 것을 방지
+        playerSprite.body.setGravityY(0); // 중력 비활성화
 
         // 애니메이션 생성
         this.anims.create({
@@ -229,6 +230,25 @@
         positionText.setText(`X: ${Math.round(playerSprite.x)}, Y: ${Math.round(playerSprite.y)}`);
     }
 
+    function createPlayer(x, y, id) {
+        // 다른 플레이어의 스프라이트를 생성
+        let newPlayerSprite = game.scene.scenes[0].physics.add.sprite(0, 0, 'cat'); // 위치는 0, 0으로 초기화
+        newPlayerSprite.setOrigin(0.5, 0.5); // 스프라이트 중앙 정렬
+        newPlayerSprite.body.setCollideWorldBounds(true); // 월드 경계에서 벗어나는 것을 방지
+        newPlayerSprite.body.setGravityY(0); // 중력 비활성화
+
+        // 플레이어의 ID를 위에 텍스트로 표시
+        let playerText = game.scene.scenes[0].add.text(0, -20, id, { fontSize: '16px', fill: '#ffffff' });
+        playerText.setOrigin(0.5, 0.5);
+
+        // 스프라이트와 텍스트를 함께 움직이기 위해 컨테이너 생성
+        let container = game.scene.scenes[0].add.container(x, y, [newPlayerSprite, playerText]);
+        container.setSize(48, 48); // 스프라이트 크기에 맞춰 컨테이너 크기 설정
+        game.scene.scenes[0].physics.world.enable(container); // 물리 엔진과 연결
+
+        return container; // 컨테이너 반환
+    }
+
     function updateOtherPlayers(data) {
         if (data.id !== sessionId) { // 자신이 보낸 메시지는 무시
             if (!otherPlayers[data.id]) {
@@ -236,15 +256,9 @@
                 otherPlayers[data.id] = createPlayer(data.x, data.y, data.id);
             } else {
                 // 기존 플레이어가 있으면 위치 업데이트
-                otherPlayers[data.id].setPosition(data.x, data.y);
+                otherPlayers[data.id].setPosition(data.x, data.y); // 컨테이너의 위치를 업데이트
             }
         }
-    }
-
-    function createPlayer(x, y, id) {
-        let newPlayerText = game.scene.scenes[0].add.text(x, y, id, { fontSize: '20px', fill: '#ffffff' });
-        newPlayerText.setOrigin(0.5, 0.5); // 텍스트 중앙 정렬
-        return newPlayerText;
     }
 
     function addChatMessage(message) {
