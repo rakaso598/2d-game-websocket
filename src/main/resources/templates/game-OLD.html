@@ -161,8 +161,9 @@
         });
 
         // 플레이어 ID 텍스트 생성
-        player = this.add.text(400, 300, sessionId, { fontSize: '22px', fill: '#FFA500' });
+        player = this.add.text(400, 60, sessionId, { fontSize: '20px', fill: '#FFFFFF' });
         player.setOrigin(0.5, 0.5); // 텍스트 중앙 정렬
+        player.setScrollFactor(0); // 화면에 고정되도록 설정
 
         // 카메라 설정: 플레이어를 따라다니도록 설정
         this.cameras.main.startFollow(playerSprite, false, 1, 0); // 가로는 따라다니고 세로는 고정 (lerpX: 1, lerpY: 0)
