@@ -140,15 +140,15 @@
     function preload() {
         // 스프라이트 시트 로드 (프레임 크기: 48x48)
         this.load.spritesheet('cat', '/assets/images/cat_walk.png', { frameWidth: 48, frameHeight: 48 });
-        this.load.image('background', '/images/pacman.png'); // 배경 이미지 로드
+        this.load.image('bg_day', '/assets/images/bg_day.png'); // 배경 이미지 로드
     }
 
     function create() {
         // 배경 이미지 추가
-        this.add.image(400, 300, 'background').setOrigin(0.5, 0.5).setDisplaySize(559, 600); // 배경 이미지 위치와 크기 설정
+        this.add.image(400, 300, 'bg_day').setOrigin(0.5, 0.5).setDisplaySize(800, 600); // 배경 이미지 위치와 크기 설정
 
         // 플레이어 스프라이트 생성
-        playerSprite = this.physics.add.sprite(400, 300, 'cat');
+        playerSprite = this.physics.add.sprite(400, 576, 'cat');
         playerSprite.setOrigin(0.5, 0.5); // 스프라이트 중앙 정렬
         playerSprite.body.setCollideWorldBounds(true); // 월드 경계에서 벗어나는 것을 방지
 
@@ -165,8 +165,8 @@
         player.setOrigin(0.5, 0.5); // 텍스트 중앙 정렬
 
         // 카메라 설정: 플레이어를 따라다니도록 설정
-        this.cameras.main.startFollow(playerSprite);
-        this.cameras.main.setBounds(0, 0, 1600, 1200); // 설정할 전체 맵의 크기 (예: 1600x1200)
+        this.cameras.main.startFollow(playerSprite, false, 1, 0); // 가로는 따라다니고 세로는 고정 (lerpX: 1, lerpY: 0)
+        this.cameras.main.setBounds(0, 0, 1600, 600); // 가로 범위는 설정하고, 세로는 600으로 고정
 
         // 플레이어 좌표 표시 텍스트 생성
         positionText = this.add.text(400, 20, '', { fontSize: '18px', fill: '#ffffff' });
