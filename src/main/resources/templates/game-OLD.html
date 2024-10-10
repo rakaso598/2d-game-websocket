@@ -131,14 +131,14 @@
     function preload() {
         this.load.spritesheet('cat_walk', '/assets/images/cat_walk.png', { frameWidth: 48, frameHeight: 48 });
         this.load.spritesheet('cat_idle', '/assets/images/cat_idle.png', { frameWidth: 48, frameHeight: 48 });
-        this.load.image('bg_day', '/assets/images/bg_day.png');
+        this.load.image('bg_spring', '/assets/images/bg_spring.png');
     }
 
     function create() {
         // 배경을 800x600 크기로 설정
-        this.add.image(400, 300, 'bg_day').setOrigin(0.5, 0.5).setDisplaySize(800, 600);
+        this.add.image(400, 300, 'bg_spring').setOrigin(0.5, 0.5).setDisplaySize(800, 600);
 
-        playerSprite = this.physics.add.sprite(400, 576, 'cat_idle');
+        playerSprite = this.physics.add.sprite(400, 350, 'cat_idle');
         playerSprite.setOrigin(0.5, 0.5);
         playerSprite.body.setCollideWorldBounds(true); // 월드 경계 내에서 이동 가능
         playerSprite.body.setGravityY(0);
