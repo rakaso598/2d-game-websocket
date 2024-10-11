@@ -20,35 +20,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests.anyRequest().authenticated()
+                        authorizeRequests
+                                .anyRequest().authenticated()  // 모든 요청은 인증 필요
                 )
-                .formLogin(withDefaults());
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/oauth2/authorization/google")  // 구글 OAuth2 로그인 페이지
+                );
 
         return http.build();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails admin = User.withUsername("admin")
-                .password(passwordEncoder().encode("admin123"))
-                .roles("ADMIN")
-                .build();
-
-        UserDetails user1 = User.withUsername("user1")
-                .password(passwordEncoder().encode("password1"))
-                .roles("USER")
-                .build();
-
-        UserDetails user2 = User.withUsername("user2")
-                .password(passwordEncoder().encode("password2"))
-                .roles("USER")
-                .build();
-
-        return new InMemoryUserDetailsManager(admin, user1, user2);
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }

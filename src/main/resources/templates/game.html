@@ -21,6 +21,7 @@
             width: 100%; /* 전체 너비 */
             padding: 10px; /* 여백 */
             text-align: center; /* 중앙 정렬 */
+            font-weight: bold;
         }
         #chatBox {
             position: absolute;
@@ -28,24 +29,24 @@
             left: 10px;
             width: 300px;
             height: 200px;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.3);
             color: white;
             overflow-y: scroll; /* 스크롤 가능 */
             padding: 10px;
-            border-radius: 5px;
+            border-radius: 0px;
         }
         #chatInput {
             position: absolute;
-            bottom: 220px;
+            bottom: 226px;
             left: 10px;
-            width: 300px;
+            width: 313px;
         }
     </style>
 </head>
 <body>
-<div id="header">Welcome to My 2D-Game!!!</div>
+<div id="header">모여라! 커뮤니티 어드벤처</div>
 <div id="chatBox"></div>
-<input type="text" id="chatInput" placeholder="채팅 입력 후 엔터" />
+<input type="text" id="chatInput" placeholder=" 채팅 입력 후 엔터 ! " />
 
 <script>
     function generateId() {
@@ -157,7 +158,7 @@
             repeat: -1
         });
 
-        player = this.add.text(400, 60, sessionId, { fontSize: '20px', fill: '#FFFFFF' });
+        player = this.add.text(400, 576, `Your Session ID : ${sessionId}`, { fontSize: '18px', fill: '#FFFFFF' });
         player.setOrigin(0.5, 0.5);
         player.setScrollFactor(0);
 

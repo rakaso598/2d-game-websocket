@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class GameController {
 
-    @GetMapping("/game")
+    @GetMapping("/")
     public String game() {
         return "game";
     }
