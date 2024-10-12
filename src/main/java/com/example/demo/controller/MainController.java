@@ -9,7 +9,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class MainController {
 
     @GetMapping("/")
-    public String game() {
+    public String index() {
         return "index";
     }
+
+    @GetMapping("/game")
+    public String game() {
+        return "game";
+    }
+
 }

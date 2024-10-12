@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>모여라! 커뮤니티 어드벤처</title>
     <style>
         body {
             display: flex;
@@ -13,9 +13,43 @@
             height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+        }
+        #header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: indianred;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 24px;
+            z-index: 1000; /* 다른 요소보다 앞에 오게 하기 위해 */
         }
         .container {
             text-align: center;
+            max-width: 600px;
+        }
+        .game-intro {
+            margin: 20px 0;
+            font-size: 18px;
+            color: #555;
+        }
+        .game-features {
+            margin: 20px 0;
+            text-align: left;
+            font-size: 16px;
+            color: #333;
+        }
+        .game-features ul {
+            padding-left: 20px;
+        }
+        .game-image {
+            width: 100%;
+            height: auto;
+            margin: 20px 0;
         }
         .login-button {
             padding: 10px 20px;
@@ -25,28 +59,54 @@
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
         .login-button:hover {
             background-color: #357ae8;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* 호버 시 그림자 강화 */
         }
-        #header {
-            background-color: indianred; /* 헤더 배경색 */
-            color: #fff; /* 헤더 텍스트 색 */
-            width: 100%; /* 전체 너비 */
-            padding: 10px 0px; /* 여백 */
-            text-align: center; /* 중앙 정렬 */
-            font-weight: bold;
+        .news {
+            background-color: #f2f2f2;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        .footer {
+            margin-top: 30px;
+            color: #888;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
+<div id="header">모여라! 커뮤니티 어드벤처</div>
 <div class="container">
-    <div id="header">모여라! 커뮤니티 어드벤처</div>
     <h1>환영합니다!</h1>
-    <p>Google 계정으로 로그인하려면 아래 버튼을 클릭하세요.</p>
+    <p class="game-intro">
+        '모여라! 커뮤니티 어드벤처'는 친구들과 함께 모험을 떠나는 협동형 커뮤니티 게임입니다. 다양한 퀘스트를 수행하고, 커뮤니티에서 새로운 친구들을 만나보세요!
+    </p>
+    <img src="game_image.jpg" alt="게임 이미지" class="game-image">
+    <div class="game-features">
+        <h2>무엇을 즐길 수 있나요?</h2>
+        <ul>
+            <li>커뮤니티 속 협동 플레이</li>
+            <li>신나는 미니게임과 이벤트</li>
+            <li>친구들과의 채팅 및 소통</li>
+        </ul>
+    </div>
+    <div class="news">
+        <h3>최신 소식</h3>
+        <p>곧 있을 오픈 이벤트! 새로운 캐릭터와 특별한 퀘스트를 준비하세요!</p>
+        <p><a href="/event-details" class="event-link">자세히 보기</a></p>
+    </div>
+    <p>Google 계정으로 로그인하여 게임을 시작하세요.</p>
     <button class="login-button" onclick="location.href='/oauth2/authorization/google'">
         Google 로그인
     </button>
+</div>
+<div class="footer">
+    © 2024 모여라! 커뮤니티 어드벤처. All rights reserved.
 </div>
 </body>
 </html>
