@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Slf4j
 @Controller
-public class GameController {
+public class MainController {
 
-    @GetMapping("/game")
+    @GetMapping("/")
     public String game() {
-        return "game";
+        return "index";
     }
 }

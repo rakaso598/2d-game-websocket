@@ -21,10 +21,12 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .anyRequest().authenticated()  // 모든 요청은 인증 필요
+                                .requestMatchers("/").permitAll()  // index.html 접근 허용
+                                .anyRequest().authenticated()  // 그 외 요청은 인증 필요
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/oauth2/authorization/google")  // 구글 OAuth2 로그인 페이지
+                        .defaultSuccessUrl("/game", true)  // 로그인 성공 후 /game 경로로 리디렉션
                 );
 
         return http.build();
